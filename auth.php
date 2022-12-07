@@ -34,7 +34,7 @@ class auth_plugin_skip extends auth_plugin_base {
     /**
      * Constructor.
      */
-    function auth_plugin_skip() {
+    function __construct() {
         $this->authtype = 'skip';
         $this->config = get_config('auth/skip');
     }
@@ -49,6 +49,10 @@ class auth_plugin_skip extends auth_plugin_base {
      */
     function user_login ($username, $password) {
         global $CFG, $DB;
+        // This plugin *only* works in developer mode.
+        if (debugging() == DEBUG_DEVELOPER) {
+            return true;
+        }
 /*
 	if ($username == 'admin') {
 		return true;
@@ -61,7 +65,7 @@ class auth_plugin_skip extends auth_plugin_base {
     }
 */
 
-	return true;
+	    return false;
 	}
     /**
      * Updates the user's password.
@@ -151,10 +155,13 @@ class auth_plugin_skip extends auth_plugin_base {
         return true;
     }
     function loginpage_hook() {
-	global $frm, $user, $DB;
-	$frm = new stdClass();
-	$frm->username = 'su';
-	$user = $DB->get_record('user', array('username' => 'su'));
+        global $frm, $user, $DB;
+        $admin = get_admin();
+        $frm = new stdClass();
+        $frm->username = $admin->username;
+        $frm->password = "";
+        $user = $admin;
+	//$user = $DB->get_record('user', $admin);
     }
 }
 
